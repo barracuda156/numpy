@@ -42,7 +42,7 @@
     #define NPY_CPU_AMD64
 #elif defined(__powerpc64__) && defined(__LITTLE_ENDIAN__)
     #define NPY_CPU_PPC64LE
-#elif defined(__powerpc64__) && defined(__BIG_ENDIAN__)
+#elif (defined(__powerpc64__) || defined(__ppc64__)) && defined(__BIG_ENDIAN__)
     #define NPY_CPU_PPC64
 #elif defined(__ppc__) || defined(__powerpc__) || defined(_ARCH_PPC)
     /*
@@ -119,7 +119,7 @@
  * alignment of data types otherwise it may lead to bus error or performance regression.
  * For more details about unaligned access, see https://www.kernel.org/doc/Documentation/unaligned-memory-access.txt.
 */
-#if defined(NPY_CPU_X86) || defined(NPY_CPU_AMD64) || defined(__aarch64__) || defined(__powerpc64__)
+#if defined(NPY_CPU_X86) || defined(NPY_CPU_AMD64) || defined(__aarch64__) || defined(__powerpc64__) || defined(__ppc64__)
     #define NPY_ALIGNMENT_REQUIRED 0
 #endif
 #ifndef NPY_ALIGNMENT_REQUIRED
