@@ -61,15 +61,17 @@ enum npy_cpu_features
     // Sapphire Rapids (Ice Lake, AVX512FP16)
     NPY_CPU_FEATURE_AVX512_SPR        = 107,
 
-    // IBM/POWER VSX
+    // IBM/POWER
+    // POWERPC
+    NPY_CPU_FEATURE_ALTIVEC           = 200,
     // POWER7
-    NPY_CPU_FEATURE_VSX               = 200,
+    NPY_CPU_FEATURE_VSX               = 201,
     // POWER8
-    NPY_CPU_FEATURE_VSX2              = 201,
+    NPY_CPU_FEATURE_VSX2              = 202,
     // POWER9
-    NPY_CPU_FEATURE_VSX3              = 202,
+    NPY_CPU_FEATURE_VSX3              = 203,
     // POWER10
-    NPY_CPU_FEATURE_VSX4              = 203,
+    NPY_CPU_FEATURE_VSX4              = 204,
 
     // ARM
     NPY_CPU_FEATURE_NEON              = 300,
@@ -150,6 +152,7 @@ npy_cpu_features_dict(void);
  * On x64: ['SSE', 'SSE2', 'SSE3']
  * On armhf: []
  * On aarch64: ['NEON', 'NEON_FP16', 'NEON_VPFV4', 'ASIMD']
+ * On ppc: []
  * On ppc64: []
  * On ppc64le: ['VSX', 'VSX2']
  * On s390x: []
@@ -172,7 +175,8 @@ npy_cpu_baseline_list(void);
  * On x64: ['SSSE3', 'SSE41', 'POPCNT', 'SSE42', 'AVX', 'F16C', 'FMA3', 'AVX2', 'AVX512F', ...]
  * On armhf: ['NEON', 'NEON_FP16', 'NEON_VPFV4', 'ASIMD', 'ASIMDHP', 'ASIMDDP', 'ASIMDFHM']
  * On aarch64: ['ASIMDHP', 'ASIMDDP', 'ASIMDFHM']
- * On ppc64:  ['VSX', 'VSX2', 'VSX3', 'VSX4']
+ * On ppc: ['ALTIVEC']
+ * On ppc64: ['ALTIVEC', 'VSX', 'VSX2', 'VSX3', 'VSX4']
  * On ppc64le: ['VSX3', 'VSX4']
  * On s390x: ['VX', 'VXE', VXE2]
  * On any other arch or if the optimization is disabled: []

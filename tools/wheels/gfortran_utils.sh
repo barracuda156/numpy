@@ -39,7 +39,7 @@ function get_distutils_platform {
     # downstream projects
     local plat=$1
     case $plat in
-        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le) ;;
+        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le|ppc64|ppc) ;;
         *) echo Did not recognize plat $plat; return 1 ;;
     esac
     local uname=${2:-$(uname)}
@@ -64,7 +64,7 @@ function get_distutils_platform_ex {
     local plat=$1
     local mb_ml_ver=${MB_ML_VER:-1}
     case $plat in
-        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le) ;;
+        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le|ppc64|ppc) ;;
         *) echo Did not recognize plat $plat; return 1 ;;
     esac
     local uname=${2:-$(uname)}

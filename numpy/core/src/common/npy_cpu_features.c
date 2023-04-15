@@ -89,6 +89,7 @@ static struct {
                 {NPY_CPU_FEATURE_AVX512_CNL, "AVX512_CNL"},
                 {NPY_CPU_FEATURE_AVX512_ICL, "AVX512_ICL"},
                 {NPY_CPU_FEATURE_AVX512_SPR, "AVX512_SPR"},
+                {NPY_CPU_FEATURE_ALTIVEC, "ALTIVEC"},
                 {NPY_CPU_FEATURE_VSX, "VSX"},
                 {NPY_CPU_FEATURE_VSX2, "VSX2"},
                 {NPY_CPU_FEATURE_VSX3, "VSX3"},
@@ -570,8 +571,9 @@ npy__cpu_init_features(void)
     npy__cpu_have[NPY_CPU_FEATURE_VSX2] = (hwcap & PPC_FEATURE2_ARCH_2_07) != 0;
     npy__cpu_have[NPY_CPU_FEATURE_VSX3] = (hwcap & PPC_FEATURE2_ARCH_3_00) != 0;
     npy__cpu_have[NPY_CPU_FEATURE_VSX4] = (hwcap & PPC_FEATURE2_ARCH_3_1) != 0;
-// TODO: AIX, OpenBSD
+// TODO: AIX, OpenBSD, Darwin
 #else
+    #if !defined(__APPLE__) // No VSX in ISA 2.03
     npy__cpu_have[NPY_CPU_FEATURE_VSX]  = 1;
     #if defined(NPY_CPU_PPC64LE) || defined(NPY_HAVE_VSX2)
     npy__cpu_have[NPY_CPU_FEATURE_VSX2] = 1;
@@ -581,6 +583,9 @@ npy__cpu_init_features(void)
     #endif
     #ifdef NPY_HAVE_VSX4
     npy__cpu_have[NPY_CPU_FEATURE_VSX4] = 1;
+    #endif
+    #else // Apple
+    npy__cpu_have[NPY_CPU_FEATURE_ALTIVEC]  = 1;
     #endif
 #endif
 }

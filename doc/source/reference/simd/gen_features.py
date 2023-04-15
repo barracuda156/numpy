@@ -156,6 +156,7 @@ def wrapper_tab(title, table, tab_size=4):
 if __name__ == '__main__':
 
     pretty_names = {
+        "PPC": "IBM/POWERPC big-endian",
         "PPC64": "IBM/POWER big-endian",
         "PPC64LE": "IBM/POWER little-endian",
         "S390X": "IBM/ZSYSTEM(S390X)",
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     with open(path.join(gen_path, 'cpu_features.inc'), 'wt') as fd:
         fd.write(f'.. generated via {__file__}\n\n')
         for arch in (
-            ("x86", "PPC64", "PPC64LE", "ARMHF", "AARCH64", "S390X")
+            ("x86", "PPC", "PPC64", "PPC64LE", "ARMHF", "AARCH64", "S390X")
         ):
             title = "On " + pretty_names.get(arch, arch)
             table = Features(arch, 'gcc').table()

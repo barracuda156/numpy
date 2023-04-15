@@ -2607,11 +2607,18 @@ class accelerate_info(system_info):
                 intel = 1
             else:
                 intel = 0
+            if 'ppc' in get_platform() or 'ppc64' in get_platform() or \
+               'powerpc' in platform.platform():
+                powerpc = 1
+            else:
+                powerpc = 0
             if (os.path.exists('/System/Library/Frameworks'
                               '/Accelerate.framework/') and
                     'accelerate' in libraries):
                 if intel:
                     args.extend(['-msse3'])
+                if powerpc:
+                    args.extend(['-faltivec'])
                 args.extend([
                     '-I/System/Library/Frameworks/vecLib.framework/Headers'])
                 link_args.extend(['-Wl,-framework', '-Wl,Accelerate'])
@@ -2620,6 +2627,8 @@ class accelerate_info(system_info):
                       'veclib' in libraries):
                 if intel:
                     args.extend(['-msse3'])
+                if powerpc:
+                    args.extend(['-faltivec'])
                 args.extend([
                     '-I/System/Library/Frameworks/vecLib.framework/Headers'])
                 link_args.extend(['-Wl,-framework', '-Wl,vecLib'])
