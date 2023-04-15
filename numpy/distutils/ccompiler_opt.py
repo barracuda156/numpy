@@ -190,9 +190,9 @@ class _Config:
     conf_c_prefix_ = 'NPY__'
     conf_cc_flags = dict(
         gcc = dict(
-            # native should always fail on arm and ppc64,
-            # native usually works only with x86
-            native = '-march=native',
+            # -march=native should always fail on arm, ppc and ppc64,
+            # -march=native usually works only with x86. -mtune=native is to be used on ppc.
+            native = '-march=native -mtune=native',
             opt = '-O3',
             werror = '-Werror',
         ),
@@ -230,6 +230,7 @@ class _Config:
     conf_min_features = dict(
         x86 = "SSE SSE2",
         x64 = "SSE SSE2 SSE3",
+        ppc = '', # play it safe
         ppc64 = '', # play it safe
         ppc64le = "VSX VSX2",
         s390x = '',
@@ -296,14 +297,16 @@ class _Config:
             detect="AVX512_SPR", implies_detect=False
         ),
         # IBM/Power
+        ## PPC/ISA 2.03
+        ALTIVEC = dict(interest=1, headers="altivec.h"),
         ## Power7/ISA 2.06
-        VSX = dict(interest=1, headers="altivec.h", extra_checks="VSX_ASM"),
+        VSX = dict(interest=2, headers="altivec.h", extra_checks="VSX_ASM"),
         ## Power8/ISA 2.07
-        VSX2 = dict(interest=2, implies="VSX", implies_detect=False),
+        VSX2 = dict(interest=3, implies="VSX", implies_detect=False),
         ## Power9/ISA 3.00
-        VSX3 = dict(interest=3, implies="VSX2", implies_detect=False),
+        VSX3 = dict(interest=4, implies="VSX2", implies_detect=False),
         ## Power10/ISA 3.1
-        VSX4 = dict(interest=4, implies="VSX3", implies_detect=False,
+        VSX4 = dict(interest=5, implies="VSX3", implies_detect=False,
                     extra_checks="VSX4_MMA"),
         # IBM/Z
         ## VX(z13) support
@@ -476,9 +479,22 @@ class _Config:
             )
         )
 
+        on_ppc = self.cc_on_ppc
+        if on_ppc:
+            partial = dict(
+                ALTIVEC = dict(
+                    flags="-faltivec"
+                )
+            )
+
+            return partial
+
         on_power = self.cc_on_ppc64le or self.cc_on_ppc64
         if on_power:
             partial = dict(
+                ALTIVEC = dict(
+                    flags="-faltivec -mtune=970"
+                ),
                 VSX = dict(
                     implies=("VSX2" if self.cc_on_ppc64le else ""),
                     flags="-mvsx"
@@ -919,6 +935,8 @@ class _CCompiler:
         True when the target architecture is 32-bit x86
     cc_on_x64 : bool
         True when the target architecture is 64-bit x86
+    cc_on_ppc : bool
+        True when the target architecture is 32-bit big-endian powerpc
     cc_on_ppc64 : bool
         True when the target architecture is 64-bit big-endian powerpc
     cc_on_ppc64le : bool
@@ -968,9 +986,11 @@ class _CCompiler:
             ("cc_on_ppc64le",  ".*(powerpc|ppc)64(el|le).*|.*powerpc.*",
                                           "defined(__powerpc64__) && "
                                           "defined(__LITTLE_ENDIAN__)"),
-            ("cc_on_ppc64",    ".*(powerpc|ppc).*|.*powerpc.*",
-                                          "defined(__powerpc64__) && "
+            ("cc_on_ppc64",    ".*(powerpc|ppc)64.*|.*powerpc.*",
+                                          "(defined(__powerpc64__) || defined(__ppc64__)) && "
                                           "defined(__BIG_ENDIAN__)"),
+            ("cc_on_ppc",    ".*(powerpc|ppc).*|.*powerpc.*",
+                                          "defined(__ppc__) && defined(__BIG_ENDIAN__)"),
             ("cc_on_aarch64",  ".*(aarch64|arm64).*", ""),
             ("cc_on_armhf",    ".*arm.*", "defined(__ARM_ARCH_7__) || "
                                           "defined(__ARM_ARCH_7A__)"),
@@ -992,7 +1012,7 @@ class _CCompiler:
         detect_args = (
            ("cc_has_debug",  ".*(O0|Od|ggdb|coverage|debug:full).*", ""),
            ("cc_has_native",
-                ".*(-march=native|-xHost|/QxHost|-mcpu=a64fx).*", ""),
+                ".*(-march=native|-mtune=native|-xHost|/QxHost|-mcpu=a64fx).*", ""),
            # in case if the class run with -DNPY_DISABLE_OPTIMIZATION
            ("cc_noopt", ".*DISABLE_OPT.*", ""),
         )
